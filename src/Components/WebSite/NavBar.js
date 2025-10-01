@@ -1,0 +1,78 @@
+import { useEffect, useState } from "react";
+import { Container, Form } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Axios } from "../../Api/axios";
+import { CATEGORIES } from "../../Api/Api";
+import "./navbar.css";
+import StringSlice from "../../helpers/StringSlice";
+import Skeleton from "react-loading-skeleton";
+import SkeletonShow from "./Skeleton/SkeletonShow";
+
+export default function NavBar(){
+    const [categories,setCategories]=useState([]);
+    const [loading,setLoading]=useState(true);
+    useEffect(()=>{
+        Axios.get(`${CATEGORIES}`).then((res)=>setCategories(res.data.slice(-8))).finally(()=>setLoading(false));
+    },[]);
+    const categoriesShow=categories.map((category)=>(
+        <Link to={`/category/${category.id}`}
+        className="m-0 category-title text-black"
+        >
+            {StringSlice(category.title,15)}
+        </Link> 
+      
+    ))
+    return(
+        <nav className="py-3">
+            <Container>
+                <div className="d-flex align-items-center justify-content-between flex-wrap">
+                    <Link className="col-3" to="/">
+                    <img   
+                    width="200px"
+                    src={require("../../assets/Logo.png")}
+                    alt="logo"
+                    />
+                    </Link>
+                    <div className="col-12 col-md-6 order-md-2 order-3 mt-md-0  md-3 position-relative">
+                        <Form.Control
+                        type="search"
+                        className="form-control custom-search py-3 rounded-0"
+                        placeholder="search Product"
+                        />
+                        <h3 className="btn-btn-primary position-absolute top-0 end-0 h-100 line-height m-0 px-4 rounded-0 d-flex-align-items-center
+                        justify-content-center">
+                            Search
+
+                        </h3>
+
+                    </div>
+                    <div className="col-3 d-flex align-items-center justify-content-end gap-4 order-md-3 order-1">
+                        <Link to="/cart">
+                        <img 
+                        width="30px"
+                        src={require("../../assets/cart.png")}
+                        alt="cart"
+
+                        />
+                        </Link>
+                          <Link to="/profile">
+                        <img 
+                        width="35px"
+                        src={require("../../assets/profile.png")}
+                        alt="profile"
+
+                        />
+                        </Link>
+
+                    </div>
+                </div>
+                <div className="mt-3">
+                <div className="d-flex align-items-center justify-content-start gap-3">{ loading ?
+              <SkeletonShow height="30px" width="80px" length="8" classes="col-2"/>: categoriesShow}
+                    <Link className="text-black category-title" to="/categories">Show All</Link>
+                </div>
+                </div>
+            </Container>
+        </nav>
+    );
+}
